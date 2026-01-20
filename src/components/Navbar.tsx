@@ -1,7 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Cpu, Zap } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Menu, X, ChevronDown } from "lucide-react";
+import { RippleButton } from "@/components/animate-ui/components/buttons/ripple";
+import { Link, useNavigate } from "react-router-dom";
+import { ThemeToggle } from "./ThemeToggle";
+import { useTheme } from "./ThemeProvider";
+import { Logo } from "./Logo";
+import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 const navLinks = [
   { href: "#features", label: "Features" },
@@ -14,22 +20,91 @@ const navLinks = [
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState("");
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
     };
+
+    // Intersection Observer for section highlighting
+    const observerOptions = {
+      root: null,
+      rootMargin: "-100px 0px -60% 0px",
+      threshold: 0,
+    };
+
+    const observerCallback = (entries: IntersectionObserverEntry[]) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setActiveSection(entry.target.id);
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(
+      observerCallback,
+      observerOptions,
+    );
+    const sections = ["features", "journey", "insights", "pricing", "contact"];
+    sections.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      observer.disconnect();
+    };
   }, []);
 
+  const {
+    user,
+    loading: checkingAuth,
+    loginWithToken,
+    logout,
+    refreshUser,
+  } = useAuth();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setIsProfileOpen(false);
+      }
+    };
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
+
+  const handleLogout = async () => {
+    await logout();
+    toast({ title: "Logged out", description: "You have been logged out." });
+    navigate("/");
+  };
   const scrollToSection = (href: string) => {
-    const element = document.querySelector(href);
+    const id = href.replace("#", "");
+    const element = document.getElementById(id);
     if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
+      const offset = 80; // Navbar height offset
+      const bodyRect = document.body.getBoundingClientRect().top;
+      const elementRect = element.getBoundingClientRect().top;
+      const elementPosition = elementRect - bodyRect;
+      const offsetPosition = elementPosition - offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth",
+      });
     }
     setIsMobileMenuOpen(false);
   };
+
+  const { theme } = useTheme();
 
   return (
     <motion.header
@@ -38,66 +113,140 @@ export const Navbar = () => {
       transition={{ duration: 0.6, ease: "easeOut" }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? "glass-dark py-3 shadow-lg shadow-background/50"
+          ? theme === "dark"
+            ? "glass-dark py-3 shadow-lg shadow-background/50"
+            : "glass py-3 shadow-lg shadow-background/50"
           : "bg-transparent py-5"
       }`}
     >
-      <div className="container mx-auto px-4 flex items-center justify-between">
+      <div className='container mx-auto px-4 flex items-center justify-between'>
         {/* Logo */}
-        <motion.a
-          href="#"
-          className="flex items-center gap-2 group"
-          whileHover={{ scale: 1.02 }}
-        >
-          <div className="relative">
-            <Cpu className="w-8 h-8 text-primary" />
-            <Zap className="w-3 h-3 text-accent absolute -top-1 -right-1" />
-          </div>
-          <span className="font-display font-bold text-xl tracking-tight">
-            <span className="text-primary">HT-NEXUS</span>
-            <span className="text-accent ml-1">AI</span>
-          </span>
-        </motion.a>
+        <Logo />
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
-            <motion.button
-              key={link.href}
-              onClick={() => scrollToSection(link.href)}
-              className="text-muted-foreground hover:text-primary transition-colors duration-200 text-sm font-medium relative group"
-              whileHover={{ y: -2 }}
-            >
-              {link.label}
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
-            </motion.button>
-          ))}
+        <nav className='hidden md:flex items-center gap-8'>
+          {navLinks.map((link) => {
+            const isActive = activeSection === link.href.replace("#", "");
+            return (
+              <motion.button
+                key={link.href}
+                onClick={() => scrollToSection(link.href)}
+                className={`transition-colors duration-200 text-sm font-medium relative group ${
+                  isActive
+                    ? "text-accent"
+                    : "text-cyber-light/70 hover:text-cyber-primary"
+                }`}
+                whileHover={{ y: -2 }}
+              >
+                {link.label}
+                <span
+                  className={`absolute -bottom-1 left-0 h-0.5 bg-accent transition-all duration-300 ${
+                    isActive ? "w-full" : "w-0 group-hover:w-full"
+                  }`}
+                />
+              </motion.button>
+            );
+          })}
         </nav>
 
         {/* Actions */}
-        <div className="hidden md:flex items-center gap-3">
-          <Button
-            variant="ghost"
-            className="text-muted-foreground hover:text-primary"
-          >
-            Login
-          </Button>
-          <Button className="bg-gradient-to-r from-accent to-cyber-primary text-accent-foreground font-semibold px-6 hover:opacity-90 transition-opacity">
-            Get Started
-          </Button>
+        <div className='hidden md:flex items-center gap-3'>
+          <ThemeToggle />
+          {user ? (
+            <div className='relative' ref={menuRef}>
+              <button
+                className='flex items-center gap-2 px-3 py-1 rounded-md hover:bg-cyber-primary/5'
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                aria-haspopup='true'
+                aria-expanded={isProfileOpen}
+              >
+                {user.avatar ? (
+                  <img
+                    src={user.avatar}
+                    alt={user.name || user.email}
+                    className='w-8 h-8 rounded-full'
+                  />
+                ) : (
+                  <div className='w-8 h-8 rounded-full bg-cyber-primary/10 flex items-center justify-center text-sm font-semibold text-cyber-primary'>
+                    {(user.first_name || user.name || user.email || "")
+                      .charAt(0)
+                      .toUpperCase()}
+                  </div>
+                )}
+                <span className='hidden sm:inline text-sm font-medium'>
+                  {user.first_name || user.name || user.email}
+                </span>
+                <ChevronDown className='w-4 h-4 text-cyber-light/80' />
+              </button>
+
+              <AnimatePresence>
+                {isProfileOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    className='absolute right-0 mt-2 w-48 bg-background rounded-md shadow-lg py-2'
+                  >
+                    <Link
+                      to='/dashboard'
+                      onClick={() => setIsProfileOpen(false)}
+                      className='block px-4 py-2 text-sm hover:bg-cyber-primary/5'
+                    >
+                      Dashboard
+                    </Link>
+                    <Link
+                      to='/profile'
+                      onClick={() => setIsProfileOpen(false)}
+                      className='block px-4 py-2 text-sm hover:bg-cyber-primary/5'
+                    >
+                      Profile
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className='w-full text-left px-4 py-2 text-sm hover:bg-cyber-primary/5'
+                    >
+                      Logout
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          ) : (
+            <>
+              <Link to='/login'>
+                <RippleButton
+                  variant='ghost'
+                  className='text-cyber-light/80 hover:text-cyber-primary'
+                >
+                  Login
+                </RippleButton>
+              </Link>
+              <Link to='/register'>
+                <RippleButton
+                  variant='accent'
+                  className='font-bold px-6 hover:opacity-90 transition-opacity'
+                >
+                  Get Started
+                </RippleButton>
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
-        <button
-          className="md:hidden text-foreground p-2"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        >
-          {isMobileMenuOpen ? (
-            <X className="w-6 h-6" />
-          ) : (
-            <Menu className="w-6 h-6" />
-          )}
-        </button>
+        <div className='flex items-center gap-2 md:hidden'>
+          <ThemeToggle />
+          <button
+            className='text-foreground p-2'
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? (
+              <X className='w-6 h-6 text-accent' />
+            ) : (
+              <Menu className='w-6 h-6 text-cyber-primary' />
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Menu */}
@@ -107,25 +256,95 @@ export const Navbar = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden glass-dark border-t border-border"
+            className={`md:hidden ${theme === "dark" ? "glass-dark" : "glass"} border-t border-cyber-primary/20`}
           >
-            <nav className="container mx-auto px-4 py-6 flex flex-col gap-4">
-              {navLinks.map((link) => (
-                <button
-                  key={link.href}
-                  onClick={() => scrollToSection(link.href)}
-                  className="text-left text-muted-foreground hover:text-primary transition-colors py-2"
-                >
-                  {link.label}
-                </button>
-              ))}
-              <div className="flex flex-col gap-3 pt-4 border-t border-border">
-                <Button variant="ghost" className="w-full justify-center">
-                  Login
-                </Button>
-                <Button className="w-full bg-gradient-to-r from-accent to-cyber-primary text-accent-foreground">
-                  Get Started
-                </Button>
+            <nav className='container mx-auto px-4 py-6 flex flex-col gap-4'>
+              {navLinks.map((link) => {
+                const isActive = activeSection === link.href.replace("#", "");
+                return (
+                  <button
+                    key={link.href}
+                    onClick={() => scrollToSection(link.href)}
+                    className={`text-left transition-colors py-2 font-medium ${
+                      isActive
+                        ? "text-accent"
+                        : "text-cyber-light/70 hover:text-cyber-primary"
+                    }`}
+                  >
+                    {link.label}
+                  </button>
+                );
+              })}
+              <div className='flex flex-col gap-3 pt-4 border-t border-cyber-primary/10'>
+                {user ? (
+                  <>
+                    <Link
+                      to='/dashboard'
+                      className='w-full'
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <RippleButton
+                        variant='ghost'
+                        className='w-full justify-center'
+                      >
+                        Dashboard
+                      </RippleButton>
+                    </Link>
+                    <Link
+                      to='/profile'
+                      className='w-full'
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <RippleButton
+                        variant='ghost'
+                        className='w-full justify-center'
+                      >
+                        Profile
+                      </RippleButton>
+                    </Link>
+                    <button
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        handleLogout();
+                      }}
+                      className='w-full'
+                    >
+                      <RippleButton
+                        variant='accent'
+                        className='w-full font-bold'
+                      >
+                        Logout
+                      </RippleButton>
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      to='/login'
+                      className='w-full'
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <RippleButton
+                        variant='ghost'
+                        className='w-full justify-center'
+                      >
+                        Login
+                      </RippleButton>
+                    </Link>
+                    <Link
+                      to='/register'
+                      className='w-full'
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <RippleButton
+                        variant='accent'
+                        className='w-full font-bold'
+                      >
+                        Get Started
+                      </RippleButton>
+                    </Link>
+                  </>
+                )}
               </div>
             </nav>
           </motion.div>

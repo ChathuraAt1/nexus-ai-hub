@@ -10,10 +10,12 @@ import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
 import ChatWidget from "@/components/ChatWidget";
 import CookieConsent from "@/components/CookieConsent";
+import FAQSection from "@/components/FAQSection";
+import MapSection from "@/components/MapSection";
 
 const Index = () => {
   return (
-    <div className="dark min-h-screen bg-background text-foreground overflow-x-hidden">
+    <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       <Navbar />
       <HeroSection />
       <PartnersMarquee />
@@ -22,6 +24,8 @@ const Index = () => {
       <IntelligenceHub />
       <Testimonials />
       <PricingSection />
+      <MapSection />
+      <FAQSection />
       <ContactSection />
       <Footer />
       <ChatWidget />

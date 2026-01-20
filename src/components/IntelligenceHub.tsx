@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Calendar, ArrowRight, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { RippleButton } from "@/components/animate-ui/components/buttons/ripple";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@/components/animate-ui/components/radix/dialog";
 
 const blogPosts = [
   {
@@ -98,7 +98,10 @@ export const IntelligenceHub = () => {
   );
 
   return (
-    <section id="insights" className="py-24 bg-card/30">
+    <section id="insights" className="py-24 relative overflow-hidden bg-background section-alternate">
+      {/* Decorative background elements */}
+      <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-cyber-primary/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-accent/5 rounded-full blur-[100px] pointer-events-none" />
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -108,7 +111,7 @@ export const IntelligenceHub = () => {
           className="text-center mb-16"
         >
           <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">
-            Intelligence <span className="text-primary">Hub</span>
+            Intelligence <span className="bg-gradient-to-r from-cyber-light to-accent bg-clip-text text-transparent">Hub</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Stay ahead with the latest insights, trends, and innovations in
@@ -134,8 +137,8 @@ export const IntelligenceHub = () => {
                   alt={post.title}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-                <span className="absolute top-4 left-4 px-3 py-1 text-xs font-semibold bg-accent/90 text-white rounded-full">
+                {/* <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/40 to-transparent" /> */}
+                <span className="absolute top-4 left-4 px-3 py-1 text-xs font-bold bg-cyber-primary/90 text-white rounded-full border border-cyber-light/30">
                   {post.category}
                 </span>
               </div>
@@ -155,15 +158,17 @@ export const IntelligenceHub = () => {
                   {post.excerpt}
                 </p>
 
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-primary hover:text-accent p-0 h-auto font-semibold"
-                  onClick={() => setSelectedPost(post)}
-                >
-                  Read Analysis
-                  <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
-                </Button>
+                <div className="flex items-center justify-center">
+                  <RippleButton
+                    variant="default"
+                    size="sm"
+                    className="bg-gradient-to-r from-cyber-primary to-accent hover:from-cyber-primary/90 hover:to-accent/90 text-white font-bold flex items-center gap-1 group/btn shadow-lg"
+                    onClick={() => setSelectedPost(post)}
+                  >
+                    Read Full Article
+                    <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                  </RippleButton>
+                </div>
               </div>
             </motion.article>
           ))}
@@ -172,34 +177,43 @@ export const IntelligenceHub = () => {
 
       {/* Blog Modal */}
       <Dialog open={!!selectedPost} onOpenChange={() => setSelectedPost(null)}>
-        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto glass-dark custom-scrollbar">
+        <DialogContent className="max-w-4xl lg:max-w-6xl max-h-[85vh] overflow-y-auto dark:glass bg-white custom-scrollbar">
           {selectedPost && (
             <>
-              <DialogHeader>
-                <div className="relative h-64 -mx-6 -mt-6 mb-6 overflow-hidden rounded-t-lg">
+              <DialogHeader className="p-0">
+                <div className="h-[500px] overflow-hidden rounded-2xl border-b border-cyber-primary/20">
                   <img
                     src={selectedPost.image}
                     alt={selectedPost.title}
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
-                  <span className="absolute top-4 left-4 px-3 py-1 text-xs font-semibold bg-accent text-white rounded-full">
+                  {/* <div className="absolute inset-0 bg-gradient-to-t from-cyber-darkest to-transparent" /> */}
+                  <span className="absolute top-4 left-4 px-3 py-1 text-xs font-bold bg-cyber-primary text-white rounded-full border border-cyber-light/30">
                     {selectedPost.category}
                   </span>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                  <Calendar className="w-4 h-4" />
-                  {selectedPost.date}
+                <div className="px-6 pt-6">
+                  <div className="flex items-center gap-2 text-sm text-cyber-light/70 mb-2">
+                    <Calendar className="w-4 h-4" />
+                    {selectedPost.date}
+                  </div>
+                  <DialogTitle className="font-display text-2xl md:text-3xl font-bold text-foreground">
+                    {selectedPost.title}
+                  </DialogTitle>
                 </div>
-                <DialogTitle className="font-display text-2xl md:text-3xl font-bold">
-                  {selectedPost.title}
-                </DialogTitle>
               </DialogHeader>
 
-              <div
-                className="prose prose-invert prose-sm max-w-none mt-6"
-                dangerouslySetInnerHTML={{ __html: selectedPost.content }}
-              />
+              <div className="px-16 mx-4 py-8 rounded-sm border border-cyber-primary/20">
+                <div
+                  className="mt-6 max-w-none text-muted-foreground
+                    [&>h3]:font-display [&>h3]:text-xl [&>h3]:font-bold [&>h3]:text-cyber-light [&>h3]:mt-6 [&>h3]:mb-3
+                    [&>p]:text-sm [&>p]:leading-relaxed [&>p]:mb-4
+                    [&>ul]:list-disc [&>ul]:pl-5 [&>ul]:mb-4 [&>ul]:space-y-2
+                    [&>li]:text-sm [&>li::marker]:text-cyber-primary
+                    [&_strong]:text-accent [&_strong]:font-bold"
+                  dangerouslySetInnerHTML={{ __html: selectedPost.content }}
+                />
+              </div>
             </>
           )}
         </DialogContent>

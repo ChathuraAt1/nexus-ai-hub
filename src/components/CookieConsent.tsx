@@ -27,7 +27,7 @@ export const CookieConsent = () => {
           exit={{ opacity: 0, y: 100 }}
           className="fixed bottom-0 left-0 right-0 z-40 p-4"
         >
-          <div className="max-w-4xl mx-auto glass-dark rounded-2xl p-6 shadow-2xl">
+          <div className="max-w-4xl mx-auto glass rounded-3xl p-6 shadow-2xl border-cyber-primary/10">
             <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
               <Cookie className="w-8 h-8 text-primary flex-shrink-0" />
               <div className="flex-1">
@@ -43,7 +43,7 @@ export const CookieConsent = () => {
                 <Button variant="outline" size="sm" onClick={() => handleAccept("essential")} className="border-primary/30">
                   Accept Essential
                 </Button>
-                <Button size="sm" onClick={() => handleAccept("all")} className="bg-gradient-to-r from-accent to-cyber-primary text-white">
+                <Button size="sm" onClick={() => handleAccept("all")} className="bg-gradient-to-r from-accent to-cyber-primary text-white rounded-xl shadow-lg shadow-accent/20 hover:opacity-90 transition-opacity">
                   Accept All
                 </Button>
               </div>
