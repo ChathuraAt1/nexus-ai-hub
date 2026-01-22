@@ -6,10 +6,13 @@ import { Link } from "react-router-dom";
 
 export const HeroSection = () => {
   return (
-    <section className='relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-20'>
+    <section
+      id='hero'
+      className='relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-20'
+    >
       {/* Animated Hexagonal Background */}
-      <div className='absolute inset-0 opacity-100 dark:opacity-40'>
-        <HexagonBackground hexagonSize={40} hexagonMargin={2} />
+      <div className='absolute inset-0 opacity-100 '>
+        <HexagonBackground hexagonSize={40} hexagonMargin={1.5} />
       </div>
 
       {/* Dynamic Background Glows for Light/Dark */}
@@ -28,7 +31,7 @@ export const HeroSection = () => {
             className='inline-flex items-center gap-2 glass px-4 py-2 rounded-full mb-8 pointer-events-auto'
           >
             <span className='w-2 h-2 bg-cyber-primary rounded-full animate-pulse shadow-[0_0_8px_rgba(127,216,220,0.8)]' />
-            <span className='text-sm font-medium text-cyber-light'>
+            <span className='text-sm font-medium text-cyber-dark dark:text-cyber-light'>
               Powered by Advanced AI Logistics
             </span>
           </motion.div>
@@ -98,7 +101,7 @@ export const HeroSection = () => {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.5 }}
-            className='grid grid-cols-3 gap-8  pt-8 dark:border-t border-border/30 dark:border-border/50 pointer-events-auto'
+            className='grid grid-cols-3 gap-8  pt-8 border-border/30 dark:border-border/50 pointer-events-auto'
           >
             {[
               { value: "40%", label: "Cost Reduction" },

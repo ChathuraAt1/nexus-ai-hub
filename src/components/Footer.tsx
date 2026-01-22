@@ -1,11 +1,18 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Cpu, Zap, Github, Twitter, Linkedin, Youtube } from "lucide-react";
+import {
+  FaXTwitter as Twitter,
+  FaFacebook as Facebook,
+  FaLinkedin as Linkedin,
+  FaYoutube as Youtube,
+  FaPinterest as Pinterest,
+} from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { RippleButton } from "@/components/animate-ui/components/buttons/ripple";
 import { useToast } from "@/hooks/use-toast";
 import { api } from "@/lib/api";
+import { Logo } from "./Logo";
 
 const footerLinks = {
   product: [
@@ -19,14 +26,37 @@ const footerLinks = {
 };
 
 const socialLinks = [
-  { icon: Twitter, href: "https://ht-techsolutions.com", label: "Twitter" },
-  { icon: Linkedin, href: "https://ht-techsolutions.com", label: "LinkedIn" },
+  { icon: Twitter, href: "https://x.com/HtTechsolu56515", label: "Twitter" },
   {
-    icon: Github,
-    href: "https://github.com/ht-techsolutions",
-    label: "GitHub",
+    icon: Linkedin,
+    href: "https://www.linkedin.com/company/ht-techsolution/",
+    label: "LinkedIn",
   },
-  { icon: Youtube, href: "https://ht-techsolutions.com", label: "YouTube" },
+  {
+    icon: Facebook,
+    href: "https://www.facebook.com/HTtech.so/",
+    label: "Facebook",
+  },
+  {
+    icon: Youtube,
+    href: "https://www.youtube.com/@HT_TechSolution",
+    label: "YouTube",
+  },
+  {
+    icon: Pinterest,
+    href: "https://www.pinterest.com/Ht_Techsolutions/",
+    label: "Pinterest",
+  },
+];
+const citationLinks = [
+  {
+    label: "F6S",
+    href: "https://ht-techsolutions.com",
+  },
+  {
+    label: "Crunchbase",
+    href: "https://ht-techsolutions.com",
+  },
 ];
 
 export const Footer = () => {
@@ -92,16 +122,7 @@ export const Footer = () => {
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12'>
           {/* Brand */}
           <div className=''>
-            <a href='/' className='flex items-center gap-2 mb-4 group'>
-              <div className='relative'>
-                <Cpu className='w-8 h-8 text-cyber-primary' />
-                <Zap className='w-3 h-3 text-accent absolute -top-1 -right-1 group-hover:scale-110 transition-transform' />
-              </div>
-              <span className='font-display font-bold text-xl tracking-tight'>
-                <span className='text-cyber-primary'>HT NEXUS</span>
-                <span className='text-accent ml-1 uppercase'>AI</span>
-              </span>
-            </a>
+            <Logo />
             <p className='text-muted-foreground text-sm mb-6 max-w-xs leading-relaxed'>
               Next-generation supply chain intelligence. Built by HT-Tech
               Solutions for the future of global logistics.
@@ -198,6 +219,20 @@ export const Footer = () => {
           <p className='text-sm text-muted-foreground'>
             © 2026 HT-Tech Solutions. All rights reserved.
           </p>
+          {/* {citation links} */}
+          <div>
+            {citationLinks.map((link, index) => (
+              <a
+                key={index}
+                href={link.href}
+                target='_blank'
+                rel='noopener noreferrer'
+                className={`text-sm text-muted-foreground hover:text-primary transition-colors ${index < citationLinks.length - 1 ? "mr-6" : ""}`}
+              >
+                {link.label}
+              </a>
+            ))}
+          </div>
           <div className='flex items-center gap-6'>
             <Link
               to='/legal/privacy'

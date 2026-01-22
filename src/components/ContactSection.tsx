@@ -80,13 +80,14 @@ export const ContactSection = () => {
     {
       icon: Phone,
       label: "Phone",
-      value: "+1 (555) 123-4567",
-      href: "tel:+15551234567",
+      value: "+1 415 782 9641",
+      href: "tel:+14157829641",
     },
     {
       icon: MapPin,
       label: "Location",
-      value: "San Francisco, CA",
+      value:
+        "500 Montgomery Street, Suite 1400, San Francisco, CA 94111, United States",
       href: "#",
     },
   ];
@@ -181,7 +182,7 @@ export const ContactSection = () => {
                   <Input
                     id='name'
                     type='text'
-                    placeholder='John Doe'
+                    placeholder='Enter your name'
                     value={formData.name}
                     onChange={(e) =>
                       setFormData({ ...formData, name: e.target.value })
@@ -201,7 +202,7 @@ export const ContactSection = () => {
                   <Input
                     id='email'
                     type='email'
-                    placeholder='john@company.com'
+                    placeholder='Enter your email'
                     value={formData.email}
                     onChange={(e) =>
                       setFormData({ ...formData, email: e.target.value })

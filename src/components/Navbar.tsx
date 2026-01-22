@@ -14,6 +14,7 @@ const navLinks = [
   { href: "#journey", label: "Journey" },
   { href: "#insights", label: "Insights" },
   { href: "#pricing", label: "Pricing" },
+  { href: "#faq", label: "FAQ" },
   { href: "#contact", label: "Contact" },
 ];
 
@@ -46,7 +47,15 @@ export const Navbar = () => {
       observerCallback,
       observerOptions,
     );
-    const sections = ["features", "journey", "insights", "pricing", "contact"];
+    const sections = [
+      "hero",
+      "features",
+      "journey",
+      "insights",
+      "pricing",
+      "faq",
+      "contact",
+    ];
     sections.forEach((id) => {
       const el = document.getElementById(id);
       if (el) observer.observe(el);
@@ -116,7 +125,7 @@ export const Navbar = () => {
           ? theme === "dark"
             ? "glass-dark py-3 shadow-lg shadow-background/50"
             : "glass py-3 shadow-lg shadow-background/50"
-          : "bg-transparent py-5"
+          : "bg-white py-5 dark:bg-neutral-900/50"
       }`}
     >
       <div className='container mx-auto px-4 flex items-center justify-between'>
@@ -134,7 +143,7 @@ export const Navbar = () => {
                 className={`transition-colors duration-200 text-sm font-medium relative group ${
                   isActive
                     ? "text-accent"
-                    : "text-cyber-light/70 hover:text-cyber-primary"
+                    : "text-cyber-dark/70 dark:text-cyber-light/70 hover:text-cyber-primary dark:hover:text-cyber-primary"
                 }`}
                 whileHover={{ y: -2 }}
               >
@@ -189,13 +198,15 @@ export const Navbar = () => {
                   >
                     <Link
                       to='/dashboard'
+                      target='_blank'
                       onClick={() => setIsProfileOpen(false)}
                       className='block px-4 py-2 text-sm hover:bg-cyber-primary/5'
                     >
                       Dashboard
                     </Link>
                     <Link
-                      to='/profile'
+                      to='/dashboard/profile'
+                      target='_blank'
                       onClick={() => setIsProfileOpen(false)}
                       className='block px-4 py-2 text-sm hover:bg-cyber-primary/5'
                     >
@@ -291,7 +302,7 @@ export const Navbar = () => {
                       </RippleButton>
                     </Link>
                     <Link
-                      to='/profile'
+                      to='/dashboard/profile'
                       className='w-full'
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
